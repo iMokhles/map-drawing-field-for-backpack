@@ -6,7 +6,9 @@
 This package provides a ```Map Drawing``` field type for the [Backpack for Laravel](https://backpackforlaravel.com/) administration panel. The ```Map Drawing``` field allows admins to **draw coordinates for specific areas on the map directly**. It uses [Google Map (Drawing) API V3](https://developers.google.com/maps/documentation/javascript/drawinglayer).
 
 
-## Screenshot
+## Video
+
+https://user-images.githubusercontent.com/1247248/136907629-c975068a-5bd8-4d97-b278-a77a48914b78.mov
 
 
 ## Requirements
