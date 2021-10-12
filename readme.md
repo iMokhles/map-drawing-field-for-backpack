@@ -13,7 +13,112 @@ https://user-images.githubusercontent.com/1247248/136907629-c975068a-5bd8-4d97-b
 
 ## Requirements
 
-- [Laravel MySQL Spatial extension](https://github.com/grimzy/laravel-mysql-spatial)
+- [Laravel MySQL Spatial extension][link-required-package]
+
+## How to use ( Polygon Example )
+
+- Edit your Model after installing [Laravel MySQL Spatial extension][link-required-package]
+- Use `SpatialTrait` within your model 
+- Add your area column name inside `$spatialFields`
+
+```php
+use Grimzy\LaravelMysqlSpatial\Eloquent\SpatialTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Zone extends Model
+{
+    // You need to use SpatialTrait
+    use HasFactory, SoftDeletes, SpatialTrait;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'name',
+        'is_active',
+    ];
+    
+    // area's column name
+    protected $spatialFields = [
+        'coordinates'
+    ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'id' => 'integer',
+        'is_active' => 'boolean',
+    ];
+}
+```
+- Edit your xxxCrudController
+- Import `LineString`, `Point`, `Polygon`
+```php
+use Grimzy\LaravelMysqlSpatial\Types\LineString;
+use Grimzy\LaravelMysqlSpatial\Types\Point;
+use Grimzy\LaravelMysqlSpatial\Types\Polygon;
+```
+- Overwrite `CreateOperation's` and `UpdateOperation's` `store` and `update` functions to reformat the data before saving it
+```php
+    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation { store as traitStore; }
+    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation { update as traitUpdate; }
+
+    public function store()
+    {
+        $this->crud->setRequest($this->crud->validateRequest());
+        $req = $this->crud->getRequest();
+
+        // do something before validation, before save, before everything
+        $this->crud->setRequest($req);
+        $this->crud->unsetValidation(); // validation has already been run
+        $response = $this->traitStore();
+        // do something after save
+        $this->handleCoords($req, $this->crud->getCurrentEntry());
+        return $response;
+    }
+
+    public function update()
+    {
+        $this->crud->setRequest($this->crud->validateRequest());
+        $req = $this->crud->getRequest();
+
+        // do something before validation, before save, before everything
+        $this->crud->setRequest($req);
+        $this->crud->unsetValidation(); // validation has already been run
+        $response = $this->traitUpdate();
+        // do something after save
+        $this->handleCoords($req, $this->crud->getCurrentEntry());
+
+        return $response;
+    }
+
+    /**
+     * @param $request
+     * @param Zone $item
+     */
+    protected function handleCoords($request, Zone $item) {
+        $value = $request->coordinates;
+        foreach(explode('),(',trim($value,'()')) as $index=>$single_array){
+            if($index == 0)
+            {
+                $lastcord = explode(',',$single_array);
+            }
+            $coords = explode(',',$single_array);
+            $polygon[] = new Point($coords[0], $coords[1]);
+        }
+
+        $polygon[] = new Point($lastcord[0], $lastcord[1]);
+        $item->coordinates = new Polygon([new LineString($polygon)]);
+        $item->save();
+    }
+```
 
 ## Installation
 
@@ -71,3 +176,4 @@ MIT. Please see the [license file](license.md) for more information.
 [link-downloads]: https://packagist.org/packages/imokhles/map-drawing-field-for-backpack
 [link-author]: https://imokhles.com
 [link-contributors]: ../../contributors
+[link-required-package]: https://github.com/grimzy/laravel-mysql-spatial
