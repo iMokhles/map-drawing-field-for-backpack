@@ -1,0 +1,38 @@
+{
+    "name": "imokhles/map-drawing-field-for-backpack",
+    "description": "Draw coordinates and save the values easily to your database using Google Map API v3 for Backpack for Laravel",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mokhlas Hussein",
+            "email": "mokhleshussien@aol.com",
+            "homepage": "https://imokhles.com"
+        }
+    ],
+    "homepage": "https://github.com/imokhles/map-drawing-field-for-backpack",
+    "keywords": [
+        "Laravel",
+        "Backpack",
+        "Backpack for Laravel",
+        "Addon",
+        "Admin Panel",
+        "Google Map Drawing",
+        "Map Drawing",
+        "Drawing Library"
+    ],
+    "require": {
+        "backpack/crud": "^4.1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "iMokhles\\MapDrawingFieldForBackpack\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "iMokhles\\MapDrawingFieldForBackpack\\AddonServiceProvider"
+            ]
+        }
+    }
+}
